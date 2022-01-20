@@ -1,7 +1,9 @@
-import React from 'react';
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { darkTheme } from './theme';
+import { useRecoilState } from 'recoil';
+import { toDoState } from './atoms/toDo';
+import Board from './components/Board';
 
 const GlobalStyle = createGlobalStyle`
   /* http://meyerweb.com/eric/tools/css/reset/
@@ -73,35 +75,32 @@ const Wrapper = styled.div`
   align-items: center;
   margin: 0 auto;
   width: 100%;
-  max-width: 480px;
+  max-width: 680px;
   height: 100vh;
 `;
 
 const Boards = styled.div`
   display: grid;
   width: 100%;
-  grid-template-columns: repeat(1, 1fr); //? 3, 1fr로 바꿀꺼임
+  gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
 `;
-
-const Board = styled.ul`
-  background-color: ${(props) => props.theme.boardColor};
-  padding: 20px 10px;
-  padding-top: 30px;
-  border-radius: 5px;
-  min-height: 200px;
-`;
-
-const Card = styled.li`
-  background-color: ${(props) => props.theme.cardColor};
-  border-radius: 5px;
-  margin-bottom: 5px;
-  padding: 10px 10px;
-`;
-
-const toDos = ['a', 'b', 'c', 'd', 'e', 'f'];
 
 function App() {
-  const onDragEnd = () => {};
+  const [toDos, setToDos] = useRecoilState(toDoState);
+
+  const onDragEnd = ({ draggableId, destination, source }: DropResult) => {
+    console.log('draggableId: ', draggableId);
+
+    if (!destination) return;
+
+    // setToDos((oldToDos) => {
+    //   const toDosCopy = [...oldToDos];
+    //   toDosCopy.splice(source.index, 1);
+    //   toDosCopy.splice(destination.index, 0, draggableId);
+    //   return toDosCopy;
+    // });
+  };
 
   return (
     <>
@@ -112,27 +111,9 @@ function App() {
         <DragDropContext onDragEnd={onDragEnd}>
           <Wrapper>
             <Boards>
-              <Droppable droppableId="one">
-                {(magic) => (
-                  <Board ref={magic.innerRef} {...magic.droppableProps}>
-                    {toDos.map((toDo, index) => (
-                      <Draggable draggableId={toDo} index={index}>
-                        {(magic) => (
-                          <Card
-                            ref={magic.innerRef}
-                            {...magic.dragHandleProps}
-                            {...magic.draggableProps}
-                          >
-                            {toDo}
-                          </Card>
-                        )}
-                      </Draggable>
-                    ))}
-                    {/* 드래그 하는 동안에 드롭 공간 크기 변동을 막아준다. */}
-                    {magic.placeholder}
-                  </Board>
-                )}
-              </Droppable>
+              {Object.keys(toDos).map((key) => (
+                <Board key={key} toDos={toDos[key]} boardId={key} />
+              ))}
             </Boards>
           </Wrapper>
         </DragDropContext>
