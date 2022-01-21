@@ -1,105 +1,79 @@
-import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { darkTheme } from './theme';
 import { useRecoilState } from 'recoil';
 import { toDoState } from './atoms/toDo';
 import Board from './components/Board';
-
-const GlobalStyle = createGlobalStyle`
-  /* http://meyerweb.com/eric/tools/css/reset/
-    v2.0 | 20110126
-    License: none (public domain)
-  */
-
-  html, body, div, span, applet, object, iframe,
-  h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-  a, abbr, acronym, address, big, cite, code,
-  del, dfn, em, img, ins, kbd, q, s, samp,
-  small, strike, strong, sub, sup, tt, var,
-  b, u, i, center,
-  dl, dt, dd, ol, ul, li,
-  fieldset, form, label, legend,
-  table, caption, tbody, tfoot, thead, tr, th, td,
-  article, aside, canvas, details, embed,
-  figure, figcaption, footer, header, hgroup,
-  menu, nav, output, ruby, section, summary,
-  time, mark, audio, video {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    font-size: 100%;
-    font: inherit;
-    vertical-align: baseline;
-  }
-  /* HTML5 display-role reset for older browsers */
-  article, aside, details, figcaption, figure,
-  footer, header, hgroup, menu, nav, section {
-    display: block;
-  }
-  body {
-    line-height: 1;
-  }
-  ol, ul {
-    list-style: none;
-  }
-  blockquote, q {
-    quotes: none;
-  }
-  blockquote:before, blockquote:after,
-  q:before, q:after {
-    content: '';
-    content: none;
-  }
-  table {
-    border-collapse: collapse;
-    border-spacing: 0;
-  }
-
-  body {
-    background-color: ${(props) => props.theme.bgColor};
-    color: black;
-    font-weight: 300;
-    line-height: 1.2;
-  }
-
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-
-`;
+import { GlobalStyle } from './styles/global';
 
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   margin: 0 auto;
-  width: 100%;
+  width: 100vw;
   max-width: 680px;
   height: 100vh;
 `;
 
 const Boards = styled.div`
-  display: grid;
+  /* display: flex;
+  justify-content: center;
+  align-items: flex;
   width: 100%;
-  gap: 10px;
+  gap: 10px; */
+  display: grid;
   grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
 `;
 
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
 
-  const onDragEnd = ({ draggableId, destination, source }: DropResult) => {
-    console.log('draggableId: ', draggableId);
+  const onDragEnd = (dropResult: DropResult) => {
+    console.log(dropResult);
+
+    /**
+     * ? draggableId: 드래그 한 카드의 ID
+     * ? source: 드래그 시점의 카드 정보
+     * ? destination: 드래그 완료시 카드 정보
+     */
+    const { draggableId, source, destination } = dropResult;
 
     if (!destination) return;
 
-    // setToDos((oldToDos) => {
-    //   const toDosCopy = [...oldToDos];
-    //   toDosCopy.splice(source.index, 1);
-    //   toDosCopy.splice(destination.index, 0, draggableId);
-    //   return toDosCopy;
-    // });
+    //* 같은 보드에서 드래그 앤 드랍 할 경우
+    if (source.droppableId === destination?.droppableId) {
+      setToDos((allBoards) => {
+        const modified = [...allBoards[destination.droppableId]];
+
+        modified.splice(source.index, 1);
+        modified.splice(destination.index, 0, draggableId);
+
+        return {
+          ...allBoards,
+          [destination.droppableId]: modified,
+        };
+      });
+    }
+
+    //* 다른 보드로 드래그 앤 드랍 할 경우
+    if (source.droppableId !== destination?.droppableId) {
+      setToDos((allBoards) => {
+        const sourceBoard = [...allBoards[source.droppableId]];
+        const destinationBoard = [...allBoards[destination.droppableId]];
+
+        sourceBoard.splice(source.index, 1);
+        destinationBoard.splice(destination.index, 0, draggableId);
+
+        return {
+          ...allBoards,
+          [source.droppableId]: sourceBoard,
+          [destination.droppableId]: destinationBoard,
+        };
+      });
+    }
   };
 
   return (
