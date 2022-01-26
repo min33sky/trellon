@@ -2,12 +2,6 @@ import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 
-interface IDraggableCard {
-  toDoId: string;
-  toDoText: string;
-  index: number;
-}
-
 const Card = styled.li<{ isDragging: boolean }>`
   /* 드래그 할 때 카드의 색상 변경 */
   background-color: ${(props) => (props.isDragging ? '#e4f2ff' : props.theme.cardColor)};
@@ -15,16 +9,29 @@ const Card = styled.li<{ isDragging: boolean }>`
   border-radius: 5px;
   margin-bottom: 5px;
   padding: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;
+
+const DeleteBtn = styled.button`
+  cursor: pointer;
+`;
+
+interface IDraggableCard {
+  toDoId: string;
+  toDoText: string;
+  index: number;
+  onRemove: (index: number) => void;
+}
 
 /**
  * 드래그 할 수 있는 카드 컴포넌트
  * @param index 카드 인덱스값
  * @returns
  */
-function DraggableCard({ index, toDoId, toDoText }: IDraggableCard) {
-  // console.log(`${toDo} is rendered. ${DraggableCard.name}`);
-
+function DraggableCard({ index, toDoId, toDoText, onRemove }: IDraggableCard) {
   return (
     <Draggable draggableId={toDoId} index={index}>
       {(magic, snapshot) => (
@@ -34,7 +41,8 @@ function DraggableCard({ index, toDoId, toDoText }: IDraggableCard) {
           {...magic.dragHandleProps}
           {...magic.draggableProps}
         >
-          {toDoText}
+          <p>{toDoText}</p>
+          <DeleteBtn onClick={() => onRemove(index)}>삭제</DeleteBtn>
         </Card>
       )}
     </Draggable>

@@ -4,7 +4,7 @@ import { Droppable } from 'react-beautiful-dnd';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
-import { ITodo, toDoState } from '../atoms/toDo';
+import { ITodo, ITodoState, toDoState } from '../atoms/toDo';
 import DraggableCard from './DraggableCard';
 
 const Wrapper = styled.ul`
@@ -57,28 +57,26 @@ interface IForm {
 
 /**
  * 카드를 드롭할 수 있는 컴포넌트
- * @param param0
+ * @param toDos 현재 보드의 상태 값
+ * @param boardId 보드 아이디
  * @returns
  */
 function Board({ toDos, boardId }: IBoard) {
   const setTodos = useSetRecoilState(toDoState);
   const { register, setValue, handleSubmit } = useForm<IForm>();
 
+  /**
+   * Form 검증 핸들러
+   * @param toDo 인풋 내용
+   */
   const onValid = ({ toDo }: IForm) => {
-    console.log(toDo);
-    /**
-     * TODO
-     * 상태 객체에서 현재 상태 객체의 키값만 수정한다.
-     */
-
-    // 등록 할 상태값 객체 생성
+    // 상태에 추가할 객체 생성
     const newTodo: ITodo = {
       id: nanoid(),
       text: toDo.trim(),
     };
 
-    console.log('boardId: ', boardId);
-
+    // 상태 업데이트
     setTodos((allBoards) => {
       return {
         ...allBoards,
@@ -86,8 +84,46 @@ function Board({ toDos, boardId }: IBoard) {
       };
     });
 
+    // 로컬 스토리지 업데이트
+    if (localStorage.getItem('toDos')) {
+      const oldTodos: ITodoState = JSON.parse(localStorage.getItem('toDos')!);
+      const updateTodos = {
+        ...oldTodos,
+        [boardId]: [...oldTodos[boardId], newTodo],
+      };
+      localStorage.setItem('toDos', JSON.stringify(updateTodos));
+    } else {
+      localStorage.setItem('toDos', JSON.stringify({ [boardId]: [newTodo] }));
+    }
+
     // 인풋 초기화
     setValue('toDo', '');
+  };
+
+  /**
+   * 카드 제거 핸들러
+   * @param index 삭제할 카드의 인덱스
+   */
+  const handleRemoveCard = (index: number) => {
+    console.log('삭제 할 카드의 보드 아이디와 인덱스: ', boardId, index);
+
+    // 상태에서 해당 카드 제거
+    setTodos((allBoards) => {
+      return {
+        ...allBoards,
+        [boardId]: allBoards[boardId].filter((_, idx) => idx !== index),
+      };
+    });
+
+    // 로컬스토리지 업데이트
+    if (localStorage.getItem('toDos')) {
+      const allTodos: ITodoState = JSON.parse(localStorage.getItem('toDos')!);
+      const updateTodos = {
+        ...allTodos,
+        [boardId]: allTodos[boardId].filter((_, idx) => idx !== index),
+      };
+      localStorage.setItem('toDos', JSON.stringify(updateTodos));
+    }
   };
 
   return (
@@ -113,7 +149,13 @@ function Board({ toDos, boardId }: IBoard) {
             {...magic.droppableProps}
           >
             {toDos.map((toDo, index) => (
-              <DraggableCard index={index} toDoId={toDo.id} toDoText={toDo.text} key={toDo.id} />
+              <DraggableCard
+                key={toDo.id}
+                index={index}
+                toDoId={toDo.id}
+                toDoText={toDo.text}
+                onRemove={handleRemoveCard}
+              />
             ))}
 
             {/* 드래그 하는 동안에 드롭 공간 크기 변동을 막아준다. */}
