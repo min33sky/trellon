@@ -3,7 +3,8 @@ import { Draggable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 
 interface IDraggableCard {
-  toDo: string;
+  toDoId: string;
+  toDoText: string;
   index: number;
 }
 
@@ -19,14 +20,13 @@ const Card = styled.li<{ isDragging: boolean }>`
 /**
  * 드래그 할 수 있는 카드 컴포넌트
  * @param index 카드 인덱스값
- * @param toDo 카드 내용
  * @returns
  */
-function DraggableCard({ index, toDo }: IDraggableCard) {
+function DraggableCard({ index, toDoId, toDoText }: IDraggableCard) {
   // console.log(`${toDo} is rendered. ${DraggableCard.name}`);
 
   return (
-    <Draggable draggableId={toDo} index={index}>
+    <Draggable draggableId={toDoId} index={index}>
       {(magic, snapshot) => (
         <Card
           isDragging={snapshot.isDragging}
@@ -34,7 +34,7 @@ function DraggableCard({ index, toDo }: IDraggableCard) {
           {...magic.dragHandleProps}
           {...magic.draggableProps}
         >
-          {toDo}
+          {toDoText}
         </Card>
       )}
     </Draggable>

@@ -1,5 +1,10 @@
+import { nanoid } from 'nanoid';
+import { useRef } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
+import { useForm } from 'react-hook-form';
+import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
+import { ITodo, toDoState } from '../atoms/toDo';
 import DraggableCard from './DraggableCard';
 
 const Wrapper = styled.ul`
@@ -34,9 +39,20 @@ const Area = styled.div<IAreaProps>`
   padding: 20px;
 `;
 
+const Form = styled.form`
+  width: 100%;
+  input {
+    width: 100%;
+  }
+`;
+
 interface IBoard {
-  toDos: string[];
+  toDos: ITodo[];
   boardId: string;
+}
+
+interface IForm {
+  toDo: string;
 }
 
 /**
@@ -45,9 +61,49 @@ interface IBoard {
  * @returns
  */
 function Board({ toDos, boardId }: IBoard) {
+  const setTodos = useSetRecoilState(toDoState);
+  const { register, setValue, handleSubmit } = useForm<IForm>();
+
+  const onValid = ({ toDo }: IForm) => {
+    console.log(toDo);
+    /**
+     * TODO
+     * 상태 객체에서 현재 상태 객체의 키값만 수정한다.
+     */
+
+    // 등록 할 상태값 객체 생성
+    const newTodo: ITodo = {
+      id: nanoid(),
+      text: toDo.trim(),
+    };
+
+    console.log('boardId: ', boardId);
+
+    setTodos((allBoards) => {
+      return {
+        ...allBoards,
+        [boardId]: [...allBoards[boardId], newTodo],
+      };
+    });
+
+    // 인풋 초기화
+    setValue('toDo', '');
+  };
+
   return (
     <Wrapper>
       <Title>{boardId}</Title>
+
+      <Form onSubmit={handleSubmit(onValid)}>
+        <input
+          type="text"
+          {...register('toDo', {
+            required: true,
+          })}
+          placeholder={`Add task on ${boardId}`}
+        />
+      </Form>
+
       <Droppable droppableId={boardId}>
         {(magic, snapshot) => (
           <Area
@@ -57,8 +113,9 @@ function Board({ toDos, boardId }: IBoard) {
             {...magic.droppableProps}
           >
             {toDos.map((toDo, index) => (
-              <DraggableCard index={index} toDo={toDo} key={toDo} />
+              <DraggableCard index={index} toDoId={toDo.id} toDoText={toDo.text} key={toDo.id} />
             ))}
+
             {/* 드래그 하는 동안에 드롭 공간 크기 변동을 막아준다. */}
             {magic.placeholder}
           </Area>

@@ -46,14 +46,18 @@ function App() {
     //* 같은 보드에서 드래그 앤 드랍 할 경우
     if (source.droppableId === destination?.droppableId) {
       setToDos((allBoards) => {
-        const modified = [...allBoards[destination.droppableId]];
-
-        modified.splice(source.index, 1);
-        modified.splice(destination.index, 0, draggableId);
+        // 현재 보드의 상태값의 배열을 복사한다.
+        const boardCopy = [...allBoards[source.droppableId]];
+        // 이동 시킬 요소 값
+        const taskObj = boardCopy[source.index];
+        // 이동 시작점의 요소를 삭제
+        boardCopy.splice(source.index, 1);
+        // 이동 시킬 요소 값을 추가
+        boardCopy.splice(destination.index, 0, taskObj);
 
         return {
           ...allBoards,
-          [destination.droppableId]: modified,
+          [destination.droppableId]: boardCopy,
         };
       });
     }
@@ -64,8 +68,10 @@ function App() {
         const sourceBoard = [...allBoards[source.droppableId]];
         const destinationBoard = [...allBoards[destination.droppableId]];
 
+        const taskObj = sourceBoard[source.index];
+
         sourceBoard.splice(source.index, 1);
-        destinationBoard.splice(destination.index, 0, draggableId);
+        destinationBoard.splice(destination.index, 0, taskObj);
 
         return {
           ...allBoards,
