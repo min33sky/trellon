@@ -126,9 +126,31 @@ function Board({ toDos, boardId }: IBoard) {
     }
   };
 
+  /**
+   * 보드 삭제 핸들러
+   */
+  const handleRemoveBoard = () => {
+    // 상태 변경
+    setTodos((allBoards) => {
+      const copyBoards = { ...allBoards };
+      delete copyBoards[boardId];
+      return copyBoards;
+    });
+
+    // 로컬 스토리지 변경
+    const storage = localStorage.getItem('toDos');
+    if (storage) {
+      const allBoards: ITodoState = JSON.parse(storage);
+      delete allBoards[boardId];
+      localStorage.setItem('toDos', JSON.stringify(allBoards));
+    }
+  };
+
   return (
     <Wrapper>
-      <Title>{boardId}</Title>
+      <Title>
+        <p>{boardId}</p> <button onClick={handleRemoveBoard}>삭제</button>
+      </Title>
 
       <Form onSubmit={handleSubmit(onValid)}>
         <input

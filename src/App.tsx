@@ -6,6 +6,7 @@ import { ITodoState, toDoState } from './atoms/toDo';
 import Board from './components/Board';
 import { GlobalStyle } from './styles/global';
 import { useEffect } from 'react';
+import AddBoard from './components/AddBoard';
 
 const Wrapper = styled.div`
   display: flex;
@@ -32,8 +33,6 @@ const Boards = styled.div`
 function App() {
   /**
    * TODO:
-   * 1. 로컬 스토리지에 저장 [ ]
-   * 2. 삭제 기능 [ ]
    * 3. 보드 자체를 드래그하기 [ ]
    */
 
@@ -41,11 +40,10 @@ function App() {
 
   useEffect(() => {
     // 로컬 스토리지에 데이터가 존재한다면 불러오기
+
     if (localStorage.getItem('toDos')) {
       console.log('로컬스토리지의 데이터로 초기화 하겠습니다.');
       setToDos(JSON.parse(localStorage.getItem('toDos')!));
-    } else {
-      console.log('로컬스토리지가 비어있습니다.');
     }
   }, [setToDos]);
 
@@ -146,6 +144,8 @@ function App() {
         {/* 드래그 앤 드랍할 수 있는 컴포넌트  */}
         <DragDropContext onDragEnd={onDragEnd}>
           <Wrapper>
+            <AddBoard />
+
             <Boards>
               {Object.keys(toDos).map((key) => (
                 <Board key={key} toDos={toDos[key]} boardId={key} />
