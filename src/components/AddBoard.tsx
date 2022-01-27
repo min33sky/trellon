@@ -1,8 +1,8 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
-import { ITodoState, toDoState } from '../atoms/toDo';
+import { ITodoState, orderState, toDoState } from '../atoms/toDo';
 
 const Form = styled.form<{ error?: boolean }>`
   /*  */
@@ -29,11 +29,13 @@ interface IForm {
 }
 
 /**
- * 보드 추가 컴포넌트
+ * 새로운 보드 추가 컴포넌트
  * @returns
  */
 function AddBoard() {
   const [toDos, setTodos] = useRecoilState(toDoState);
+  const setOrder = useSetRecoilState(orderState);
+
   const {
     register,
     setValue,
@@ -66,7 +68,7 @@ function AddBoard() {
       return;
     }
 
-    // 보드 추가하기
+    //* 보드를 새로 생성 한 후 순서와 함께 상태값 업데이트
     setTodos((allBoards) => {
       return {
         ...allBoards,
@@ -74,20 +76,28 @@ function AddBoard() {
       };
     });
 
-    // 로컬 스토리지에 추가
-    const storage = localStorage.getItem('toDos');
-    if (storage) {
-      const oldBoards: ITodoState = JSON.parse(storage);
+    setOrder((prev) => [...prev, boardName]);
+
+    //* 로컬 스토리지에 추가
+    const toDosStorage = localStorage.getItem('toDos');
+    const orderStorage = localStorage.getItem('order');
+
+    if (toDosStorage && orderStorage) {
+      const oldBoards: ITodoState = JSON.parse(toDosStorage);
       const newBoards = {
         ...oldBoards,
         [boardName]: [],
       };
       localStorage.setItem('toDos', JSON.stringify(newBoards));
+
+      const oldOrder: string[] = JSON.parse(orderStorage);
+      localStorage.setItem('order', JSON.stringify([...oldOrder, boardName]));
     } else {
       const newBoards = {
         [boardName]: [],
       };
       localStorage.setItem('toDos', JSON.stringify(newBoards));
+      localStorage.setItem('order', JSON.stringify([boardName]));
     }
 
     setValue('boardName', '');
