@@ -50,7 +50,9 @@ export const GlobalStyle = createGlobalStyle`
     border-spacing: 0;
   }
 
+
   body {
+    box-sizing: border-box;
     background-color: ${(props) => props.theme.bgColor};
     color: black;
     font-weight: 300;

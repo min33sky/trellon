@@ -2,9 +2,8 @@ import styled, { ThemeProvider } from 'styled-components';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { darkTheme } from './theme';
 import { useRecoilState } from 'recoil';
-import { ITodoState, orderState, toDoState } from './atoms/toDo';
+import { orderState, toDoState } from './atoms/toDo';
 import { GlobalStyle } from './styles/global';
-import { useEffect } from 'react';
 import AddBoard from './components/AddBoard';
 import DraggableBoard from './components/DraggableBoard';
 
@@ -31,26 +30,8 @@ const Boards = styled.div`
 `;
 
 function App() {
-  /**
-   * TODO:
-   * 3. 보드 자체를 드래그하기 [ ]
-   */
-
   const [toDos, setToDos] = useRecoilState(toDoState);
   const [order, setOrder] = useRecoilState(orderState);
-
-  useEffect(() => {
-    // 로컬 스토리지에 데이터가 존재한다면 불러오기
-
-    const toDosStorage = localStorage.getItem('toDos');
-    const orderStorage = localStorage.getItem('order');
-
-    if (toDosStorage && orderStorage) {
-      console.log('로컬스토리지의 데이터로 초기화 하겠습니다.');
-      setToDos(JSON.parse(toDosStorage));
-      setOrder(JSON.parse(orderStorage));
-    }
-  }, [setOrder, setToDos]);
 
   /**
    * 카드의 드래그 종료 후 이벤트 핸들러
@@ -79,16 +60,6 @@ function App() {
         orderCopy.splice(destination.index, 0, selectCategory);
         return orderCopy;
       });
-
-      // 로컬 스토리지 업데이트
-      const orderStorage = localStorage.getItem('order');
-      if (orderStorage) {
-        const orderCopy: string[] = JSON.parse(orderStorage);
-        const select = orderCopy[source.index];
-        orderCopy.splice(source.index, 1);
-        orderCopy.splice(destination.index, 0, select);
-        localStorage.setItem('order', JSON.stringify(orderCopy));
-      }
     }
 
     //* 같은 보드에서 드래그 앤 드랍 할 경우
@@ -103,21 +74,6 @@ function App() {
         boardCopy.splice(source.index, 1);
         // 이동 시킬 요소 값을 추가
         boardCopy.splice(destination.index, 0, taskObj);
-
-        // 로컬 스토리지 업데이트
-        if (localStorage.getItem('toDos')) {
-          const oldTodos: ITodoState = JSON.parse(localStorage.getItem('toDos')!);
-          const boardCopy = [...oldTodos[source.droppableId]];
-          const taskObj = boardCopy[source.index];
-          boardCopy.splice(source.index, 1);
-          boardCopy.splice(destination.index, 0, taskObj);
-
-          const updateTodos = {
-            ...oldTodos,
-            [destination.droppableId]: boardCopy,
-          };
-          localStorage.setItem('toDos', JSON.stringify(updateTodos));
-        }
 
         return {
           ...allBoards,
@@ -136,23 +92,6 @@ function App() {
 
         sourceBoard.splice(source.index, 1);
         destinationBoard.splice(destination.index, 0, taskObj);
-
-        // 로컬 스토리지 업데이트
-        if (localStorage.getItem('toDos')) {
-          const oldTodos: ITodoState = JSON.parse(localStorage.getItem('toDos')!);
-          const sourceBoard = [...oldTodos[source.droppableId]];
-          const destinationBoard = [...oldTodos[destination.droppableId]];
-          const taskObj = sourceBoard[source.index];
-          sourceBoard.splice(source.index, 1);
-          destinationBoard.splice(destination.index, 0, taskObj);
-
-          const updateTodos = {
-            ...oldTodos,
-            [source.droppableId]: sourceBoard,
-            [destination.droppableId]: destinationBoard,
-          };
-          localStorage.setItem('toDos', JSON.stringify(updateTodos));
-        }
 
         return {
           ...allBoards,

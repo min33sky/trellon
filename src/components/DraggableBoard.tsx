@@ -9,6 +9,11 @@ interface IDraggableBoardProps {
   toDos: ITodo[];
 }
 
+/**
+ * 드래그 할 수 있는 보드
+ * @param param0
+ * @returns
+ */
 function DraggableBoard({ draggableId, index, toDos }: IDraggableBoardProps) {
   return (
     <Draggable draggableId={`category-${draggableId}`} index={index}>

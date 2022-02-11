@@ -3,7 +3,7 @@ import { Droppable } from 'react-beautiful-dnd';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
-import { ITodo, ITodoState, orderState, toDoState } from '../atoms/toDo';
+import { ITodo, orderState, toDoState } from '../atoms/toDo';
 import DraggableCard from './DraggableCard';
 
 const Wrapper = styled.ul`
@@ -55,7 +55,7 @@ interface IForm {
 }
 
 /**
- * 카드를 드롭할 수 있는 컴포넌트
+ * 드래그한 카드를 드롭할 수 있는 컴포넌트
  * @param toDos 현재 보드의 상태 값
  * @param boardId 보드 아이디
  * @returns
@@ -84,18 +84,6 @@ function Board({ toDos, boardId }: IBoard) {
       };
     });
 
-    // 로컬 스토리지 업데이트
-    if (localStorage.getItem('toDos')) {
-      const oldTodos: ITodoState = JSON.parse(localStorage.getItem('toDos')!);
-      const updateTodos = {
-        ...oldTodos,
-        [boardId]: [...oldTodos[boardId], newTodo],
-      };
-      localStorage.setItem('toDos', JSON.stringify(updateTodos));
-    } else {
-      localStorage.setItem('toDos', JSON.stringify({ [boardId]: [newTodo] }));
-    }
-
     // 인풋 초기화
     setValue('toDo', '');
   };
@@ -105,8 +93,6 @@ function Board({ toDos, boardId }: IBoard) {
    * @param index 삭제할 카드의 인덱스
    */
   const handleRemoveCard = (index: number) => {
-    console.log('삭제 할 카드의 보드 아이디와 인덱스: ', boardId, index);
-
     // 상태에서 해당 카드 제거
     setTodos((allBoards) => {
       return {
@@ -114,48 +100,19 @@ function Board({ toDos, boardId }: IBoard) {
         [boardId]: allBoards[boardId].filter((_, idx) => idx !== index),
       };
     });
-
-    // 로컬스토리지 업데이트
-    if (localStorage.getItem('toDos')) {
-      const allTodos: ITodoState = JSON.parse(localStorage.getItem('toDos')!);
-      const updateTodos = {
-        ...allTodos,
-        [boardId]: allTodos[boardId].filter((_, idx) => idx !== index),
-      };
-      localStorage.setItem('toDos', JSON.stringify(updateTodos));
-    }
   };
 
   /**
    * 보드 삭제 핸들러
    */
   const handleRemoveBoard = () => {
-    console.log('111', boardId);
-
-    // 상태 변경
     setTodos((allBoards) => {
       const copyBoards = { ...allBoards };
       delete copyBoards[boardId];
       return copyBoards;
     });
-    console.log('222', boardId);
 
-    // ? 카테고리도 삭제해야함
     setOrders((allOrders) => allOrders.filter((order) => boardId !== order));
-
-    // 로컬 스토리지 변경
-    const storage = localStorage.getItem('toDos');
-    if (storage) {
-      const allBoards: ITodoState = JSON.parse(storage);
-      delete allBoards[boardId];
-      localStorage.setItem('toDos', JSON.stringify(allBoards));
-    }
-    const temp = localStorage.getItem('order');
-    if (temp) {
-      const allBoards: string[] = JSON.parse(temp);
-      const yoshi = allBoards.filter((order) => order !== boardId);
-      localStorage.setItem('order', JSON.stringify(yoshi));
-    }
   };
 
   return (

@@ -2,10 +2,9 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
-import { ITodoState, orderState, toDoState } from '../atoms/toDo';
+import { orderState, toDoState } from '../atoms/toDo';
 
 const Form = styled.form<{ error?: boolean }>`
-  /*  */
   position: absolute;
   top: 100px;
   width: 100%;
@@ -77,28 +76,6 @@ function AddBoard() {
     });
 
     setOrder((prev) => [...prev, boardName]);
-
-    //* 로컬 스토리지에 추가
-    const toDosStorage = localStorage.getItem('toDos');
-    const orderStorage = localStorage.getItem('order');
-
-    if (toDosStorage && orderStorage) {
-      const oldBoards: ITodoState = JSON.parse(toDosStorage);
-      const newBoards = {
-        ...oldBoards,
-        [boardName]: [],
-      };
-      localStorage.setItem('toDos', JSON.stringify(newBoards));
-
-      const oldOrder: string[] = JSON.parse(orderStorage);
-      localStorage.setItem('order', JSON.stringify([...oldOrder, boardName]));
-    } else {
-      const newBoards = {
-        [boardName]: [],
-      };
-      localStorage.setItem('toDos', JSON.stringify(newBoards));
-      localStorage.setItem('order', JSON.stringify([boardName]));
-    }
 
     setValue('boardName', '');
   };
