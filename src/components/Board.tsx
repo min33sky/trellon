@@ -3,7 +3,7 @@ import { Droppable } from 'react-beautiful-dnd';
 import { useForm } from 'react-hook-form';
 import { useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
-import { ITodo, ITodoState, toDoState } from '../atoms/toDo';
+import { ITodo, ITodoState, orderState, toDoState } from '../atoms/toDo';
 import DraggableCard from './DraggableCard';
 
 const Wrapper = styled.ul`
@@ -62,6 +62,7 @@ interface IForm {
  */
 function Board({ toDos, boardId }: IBoard) {
   const setTodos = useSetRecoilState(toDoState);
+  const setOrders = useSetRecoilState(orderState);
   const { register, setValue, handleSubmit } = useForm<IForm>();
 
   /**
@@ -129,12 +130,18 @@ function Board({ toDos, boardId }: IBoard) {
    * 보드 삭제 핸들러
    */
   const handleRemoveBoard = () => {
+    console.log('111', boardId);
+
     // 상태 변경
     setTodos((allBoards) => {
       const copyBoards = { ...allBoards };
       delete copyBoards[boardId];
       return copyBoards;
     });
+    console.log('222', boardId);
+
+    // ? 카테고리도 삭제해야함
+    setOrders((allOrders) => allOrders.filter((order) => boardId !== order));
 
     // 로컬 스토리지 변경
     const storage = localStorage.getItem('toDos');
@@ -142,6 +149,12 @@ function Board({ toDos, boardId }: IBoard) {
       const allBoards: ITodoState = JSON.parse(storage);
       delete allBoards[boardId];
       localStorage.setItem('toDos', JSON.stringify(allBoards));
+    }
+    const temp = localStorage.getItem('order');
+    if (temp) {
+      const allBoards: string[] = JSON.parse(temp);
+      const yoshi = allBoards.filter((order) => order !== boardId);
+      localStorage.setItem('order', JSON.stringify(yoshi));
     }
   };
 
