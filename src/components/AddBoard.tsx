@@ -8,17 +8,18 @@ const Form = styled.form<{ error?: boolean }>`
   position: absolute;
   top: 100px;
   width: 100%;
-  max-width: 240px;
+  max-width: 300px;
 
   input {
     width: 100%;
     border: 0;
     border-radius: 10px;
     outline: none;
-    padding: 10px 20px;
+    padding: 10px 15px;
+    font-size: 1rem;
 
     ::placeholder {
-      color: ${(props) => (props.error ? 'red' : 'black')};
+      color: ${(props) => (props.error ? '#e84118' : 'black')};
     }
   }
 `;
@@ -84,12 +85,11 @@ function AddBoard() {
     <Form onSubmit={handleSubmit(onValid)} error={Boolean(errors.boardName)}>
       <input
         type="text"
-        placeholder={
-          errors.boardName ? errors.boardName?.message : '추가 할 보드의 제목을 입력하세요.'
-        }
+        placeholder={errors.boardName ? errors.boardName?.message : '나만의 보드를 추가하세요 :)'}
         {...register('boardName', {
           maxLength: 10,
         })}
+        maxLength={10}
       />
     </Form>
   );

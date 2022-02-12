@@ -11,7 +11,9 @@ interface IDraggableBoardProps {
 
 /**
  * 드래그 할 수 있는 보드
- * @param param0
+ * @param draggableId 보드의 id
+ * @param index 보드의 위치를 나타내는 index
+ * @param toDos 투두 내용이 담긴 배열
  * @returns
  */
 function DraggableBoard({ draggableId, index, toDos }: IDraggableBoardProps) {

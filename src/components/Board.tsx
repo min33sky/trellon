@@ -10,7 +10,9 @@ const Wrapper = styled.ul`
   background-color: ${(props) => props.theme.boardColor};
   padding-top: 10px;
   border-radius: 5px;
-  min-height: 300px;
+  min-width: 260px;
+  height: 500px;
+  height: 500px;
 
   /* 드롭 가능 범위를 최대 범위로 고정시키기 위해서 */
   display: flex;
@@ -19,10 +21,14 @@ const Wrapper = styled.ul`
 `;
 
 const Title = styled.div`
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 600;
-  margin-bottom: 10px;
+  margin-top: 10px;
+  margin-bottom: 20px;
   font-size: 18px;
+  gap: 10px;
 `;
 
 interface IAreaProps {
@@ -36,12 +42,51 @@ const Area = styled.div<IAreaProps>`
   flex-grow: 1; // 드롭 장소를 전체 범위로 늘린다
   transition: background-color 0.3s ease-in-out;
   padding: 20px;
+  overflow-y: auto;
+
+  /* 스크롤바 설정*/
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  /* 스크롤바 막대 설정*/
+  ::-webkit-scrollbar-thumb {
+    height: 17%;
+    background-color: rgba(39, 60, 117, 0.8);
+    border-radius: 10px;
+  }
+
+  /* 스크롤바 뒷 배경 설정*/
+  ::-webkit-scrollbar-track {
+    background-color: rgba(39, 60, 117, 0.33);
+  }
 `;
 
 const Form = styled.form`
-  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+
   input {
-    width: 100%;
+    width: 80%;
+    padding: 8px;
+    font-size: 14px;
+    outline: none;
+    border: none;
+    border-radius: 10px;
+  }
+`;
+
+const TrashIcon = styled.svg`
+  display: block;
+  width: 25px;
+  height: 25px;
+  color: black;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+
+  &:hover {
+    color: rgba(232, 65, 24, 1);
   }
 `;
 
@@ -118,7 +163,21 @@ function Board({ toDos, boardId }: IBoard) {
   return (
     <Wrapper>
       <Title>
-        <p>{boardId}</p> <button onClick={handleRemoveBoard}>삭제</button>
+        <span>{boardId}</span>
+        <TrashIcon
+          onClick={handleRemoveBoard}
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+          />
+        </TrashIcon>
       </Title>
 
       <Form onSubmit={handleSubmit(onValid)}>

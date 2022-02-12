@@ -53,7 +53,8 @@ export const GlobalStyle = createGlobalStyle`
 
   body {
     box-sizing: border-box;
-    background-color: ${(props) => props.theme.bgColor};
+
+    background: ${(props) => props.theme.bgColor};
     color: black;
     font-weight: 300;
     line-height: 1.2;

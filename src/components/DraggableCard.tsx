@@ -7,16 +7,29 @@ const Card = styled.li<{ isDragging: boolean }>`
   background-color: ${(props) => (props.isDragging ? '#e4f2ff' : props.theme.cardColor)};
   box-shadow: ${(props) => (props.isDragging ? '0px 2px 5px rgba(0,0,0,0.5)' : 'none')};
   border-radius: 5px;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   padding: 10px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  p {
+    font-weight: 600;
+  }
 `;
 
-const DeleteBtn = styled.button`
+const RemoveIcon = styled.svg`
+  display: block;
+  width: 25px;
+  height: 25px;
+  color: black;
+  transition: all 0.2s ease-in-out;
   cursor: pointer;
+
+  &:hover {
+    color: rgba(232, 65, 24, 1);
+  }
 `;
 
 interface IDraggableCard {
@@ -42,7 +55,20 @@ function DraggableCard({ index, toDoId, toDoText, onRemove }: IDraggableCard) {
           {...magic.draggableProps}
         >
           <p>{toDoText}</p>
-          <DeleteBtn onClick={() => onRemove(index)}>삭제</DeleteBtn>
+          <RemoveIcon
+            onClick={() => onRemove(index)}
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </RemoveIcon>
         </Card>
       )}
     </Draggable>

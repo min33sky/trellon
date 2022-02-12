@@ -6,27 +6,46 @@ import { orderState, toDoState } from './atoms/toDo';
 import { GlobalStyle } from './styles/global';
 import AddBoard from './components/AddBoard';
 import DraggableBoard from './components/DraggableBoard';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   margin: 0 auto;
-  width: 100vw;
-  max-width: 680px;
+  /* width: 100vw; */
+  max-width: 1280px;
   height: 100vh;
 `;
 
 const Boards = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: flex;
+  justify-content: flex-start;
+  align-items: center;
   width: 100%;
-  gap: 10px;
-  /* display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  width: 100%; */
+  overflow-x: auto;
+  gap: 20px;
+  padding-bottom: 2rem;
+  cursor: grab;
+
+  /* 스크롤바 설정*/
+  ::-webkit-scrollbar {
+    /* width: 10px; */
+    height: 10px;
+  }
+
+  /* 스크롤바 막대 설정*/
+  ::-webkit-scrollbar-thumb {
+    /* height: 22%; */
+    background: linear-gradient(to right, rgba(113, 128, 147, 0.5), rgba(127, 143, 166, 0.5));
+    /* 스크롤바 둥글게 설정    */
+    border-radius: 10px;
+  }
+
+  /* 스크롤바 뒷 배경 설정*/
+  ::-webkit-scrollbar-track {
+    background-color: rgba(33, 133, 133, 0);
+  }
 `;
 
 function App() {
@@ -104,27 +123,38 @@ function App() {
 
   return (
     <>
-      <ThemeProvider theme={darkTheme}>
-        <GlobalStyle />
+      <HelmetProvider>
+        <Helmet>
+          <title>Trellon</title>
+        </Helmet>
 
-        {/* 드래그 앤 드랍할 수 있는 컴포넌트  */}
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Wrapper>
-            <AddBoard />
+        <ThemeProvider theme={darkTheme}>
+          <GlobalStyle />
 
-            <Droppable droppableId="category" type="category" direction="horizontal">
-              {(provided) => (
-                <Boards ref={provided.innerRef} {...provided.droppableProps}>
-                  {order.map((key, index) => (
-                    <DraggableBoard key={key} draggableId={key} index={index} toDos={toDos[key]} />
-                  ))}
-                  {provided.placeholder}
-                </Boards>
-              )}
-            </Droppable>
-          </Wrapper>
-        </DragDropContext>
-      </ThemeProvider>
+          {/* 드래그 앤 드랍할 수 있는 컴포넌트  */}
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Wrapper>
+              <AddBoard />
+
+              <Droppable droppableId="category" type="category" direction="horizontal">
+                {(provided) => (
+                  <Boards ref={provided.innerRef} {...provided.droppableProps}>
+                    {order.map((key, index) => (
+                      <DraggableBoard
+                        key={key}
+                        draggableId={key}
+                        index={index}
+                        toDos={toDos[key]}
+                      />
+                    ))}
+                    {provided.placeholder}
+                  </Boards>
+                )}
+              </Droppable>
+            </Wrapper>
+          </DragDropContext>
+        </ThemeProvider>
+      </HelmetProvider>
     </>
   );
 }
