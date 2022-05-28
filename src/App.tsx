@@ -14,7 +14,7 @@ const Wrapper = styled.div`
   align-items: center;
   margin: 0 auto;
   /* width: 100vw; */
-  max-width: 1280px;
+  max-width: 1000px;
   height: 100vh;
 `;
 
@@ -22,7 +22,7 @@ const Boards = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  width: 100%;
+  /* width: 100%; */
   overflow-x: auto;
   gap: 20px;
   padding-bottom: 2rem;
@@ -31,7 +31,7 @@ const Boards = styled.div`
   /* 스크롤바 설정*/
   ::-webkit-scrollbar {
     /* width: 10px; */
-    height: 10px;
+    height: 20px;
   }
 
   /* 스크롤바 막대 설정*/
